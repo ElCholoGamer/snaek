@@ -1,12 +1,15 @@
 {
 	"name": "snaek",
-	"version": "1.0.1",
-	"description": "A terminal implementation of the snake game",
+	"version": "1.0.3",
+	"description": "A Node.js implementation of the snake game",
 	"exports": "./dist/index.js",
 	"author": "ElCholoGamer",
 	"homepage": "https://github.com/ElCholoGamer/snaek#readme",
 	"license": "MIT",
 	"type": "module",
+	"files": [
+		"dist/**/*"
+	],
 	"keywords": [
 		"snake",
 		"cli",
