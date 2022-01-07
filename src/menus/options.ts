@@ -3,6 +3,8 @@ import { getGameOptions, setOption } from '../config.js';
 import { menuTitle } from '../constants.js';
 
 async function optionsMenu() {
+	let lastAction = 'arenaSize';
+
 	while (true) {
 		console.clear();
 		console.log(menuTitle('Options'));
@@ -13,6 +15,7 @@ async function optionsMenu() {
 			type: 'list',
 			name: 'action',
 			message: 'Select an option',
+			default: lastAction,
 			choices: [
 				{ name: `Arena size (${options.gridSize})`, value: 'arenaSize' },
 				{ name: `Apple count (${options.activeApples})`, value: 'appleCount' },
@@ -25,6 +28,8 @@ async function optionsMenu() {
 
 		if (action === 'Go back') return;
 
+		lastAction = action;
+
 		console.clear();
 		console.log(menuTitle('Options'));
 
@@ -33,43 +38,34 @@ async function optionsMenu() {
 				const { arenaSize } = await inquirer.prompt({
 					type: 'list',
 					name: 'arenaSize',
-					default: options.gridSize,
+					default: `${options.gridSize}`,
 					message: 'Select an arena size',
-					choices: [...Array(5)].map((_, index) => {
-						const value = 8 + index * 8;
-						return { name: `${value}`, value };
-					}),
+					choices: [...Array(17)].map((_, index) => `${8 + index * 2}`),
 				});
 
-				setOption('gridSize', arenaSize);
+				setOption('gridSize', Number(arenaSize));
 				break;
 			case 'appleCount':
 				const { appleCount } = await inquirer.prompt({
 					type: 'list',
 					name: 'appleCount',
-					default: options.activeApples,
+					default: `${options.activeApples}`,
 					message: 'Select an apple count',
-					choices: [...Array(5)].map((_, index) => {
-						const value = 1 + index;
-						return { name: `${value}`, value };
-					}),
+					choices: [...Array(5)].map((_, index) => `${1 + index}`),
 				});
 
-				setOption('activeApples', appleCount);
+				setOption('activeApples', Number(appleCount));
 				break;
 			case 'tickSpeed':
 				const { tickSpeed } = await inquirer.prompt({
 					type: 'list',
 					name: 'tickSpeed',
 					message: 'Select a tick speed',
-					default: options.tickSpeed,
-					choices: [...Array(5)].map((_, index) => {
-						const value = 50 + index * 50;
-						return { name: `${value}ms`, value };
-					}),
+					default: `${options.tickSpeed}ms`,
+					choices: [...Array(5)].map((_, index) => `${50 + index * 50}ms`),
 				});
 
-				setOption('tickSpeed', tickSpeed);
+				setOption('tickSpeed', Number(tickSpeed.replace('ms', '')));
 				break;
 			case 'solidBorders':
 				const { solidBorders } = await inquirer.prompt({
