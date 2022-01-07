@@ -3,8 +3,8 @@ import { Coordinate, GameOptions } from './types.js';
 import { sleep } from './utils.js';
 
 class Game {
-	private segments: Coordinate[] = [{ x: 4, y: 4 }];
-	private apples: Coordinate[] = [...Array(this.options.activeApples)].map(() => ({ x: 0, y: 0 }));
+	private segments: Coordinate[] = [];
+	private apples: Coordinate[] = [];
 	private direction = Direction.RIGHT;
 	private alive = false;
 
@@ -32,6 +32,11 @@ class Game {
 	public constructor(private readonly options: GameOptions) {}
 
 	public async run() {
+		const { gridSize } = this.options;
+
+		this.segments.push({ x: Math.floor(gridSize / 2), y: Math.floor(gridSize / 2) });
+		this.apples.push(...[...Array(this.options.activeApples)].map(() => ({ x: 0, y: 0 })));
+
 		for (let i = 0; i < this.apples.length; i++) {
 			this.randomizeApple(i);
 		}
