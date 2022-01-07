@@ -1,4 +1,4 @@
-# Snaek
+# Snaek &middot; ![Build](https://github.com/ElCholoGamer/snaek/actions/workflows/build.yml/badge.svg)
 
 A Node.js implementation of the snake game 🐍
 
