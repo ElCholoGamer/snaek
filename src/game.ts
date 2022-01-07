@@ -11,7 +11,7 @@ class Game {
 	private countdown = 3;
 	private hudText = '';
 
-	private static keyDown = '';
+	private static nextDirection = Direction.RIGHT;
 
 	public static initInput() {
 		process.stdin.setRawMode(true);
@@ -25,10 +25,25 @@ class Game {
 
 	public static handleStdin(data: Buffer) {
 		const key = data.toString();
-		if (key === '\u0003') process.exit();
 
-		if ('wasd'.includes(key)) {
-			Game.keyDown = key;
+		switch (key) {
+			case '\u0003':
+				process.exit();
+			case 'w':
+			case '\u001b[A':
+				Game.nextDirection = Direction.UP;
+				break;
+			case 's':
+			case '\u001b[B':
+				Game.nextDirection = Direction.DOWN;
+				break;
+			case 'd':
+			case '\u001b[C':
+				Game.nextDirection = Direction.RIGHT;
+				break;
+			case 'a':
+			case '\u001b[D':
+				Game.nextDirection = Direction.LEFT;
 		}
 	}
 
@@ -44,6 +59,7 @@ class Game {
 			this.randomizeApple(i);
 		}
 
+		Game.nextDirection = this.direction;
 		this.alive = true;
 
 		while (this.countdown > 0) {
@@ -92,35 +108,34 @@ class Game {
 	}
 
 	private tick() {
-		switch (Game.keyDown) {
-			case 'w':
+		switch (Game.nextDirection) {
+			case Direction.UP:
 				if (this.direction !== Direction.DOWN) {
 					this.direction = Direction.UP;
 				}
 				break;
-			case 'd':
-				if (this.direction !== Direction.LEFT) {
-					this.direction = Direction.RIGHT;
-				}
-				break;
-			case 's':
+			case Direction.DOWN:
 				if (this.direction !== Direction.UP) {
 					this.direction = Direction.DOWN;
 				}
 				break;
-			case 'a':
+			case Direction.RIGHT:
+				if (this.direction !== Direction.LEFT) {
+					this.direction = Direction.RIGHT;
+				}
+				break;
+			case Direction.LEFT:
 				if (this.direction !== Direction.RIGHT) {
 					this.direction = Direction.LEFT;
 				}
 		}
 
 		const tailClone = { ...this.segments[this.segments.length - 1] };
-
 		const newHead = { ...this.segments[0] };
 
-		// Head movement
 		const { gridSize, solidBorders } = this.options;
 
+		// Head movement
 		switch (this.direction) {
 			case Direction.UP:
 				newHead.y--;

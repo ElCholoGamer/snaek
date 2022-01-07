@@ -4,7 +4,7 @@ import { waitForKeyPress } from '../utils.js';
 
 async function helpMenu() {
 	const help = [
-		'Use the WASD keys to move.',
+		'Use the arrow keys or WASD to move.',
 		`Grab apples (${drawChars.apple}) and avoid crashing into your body (${drawChars.snakeBody}).`,
 	];
 
