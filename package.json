@@ -1,6 +1,6 @@
 {
 	"name": "snaek",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "A terminal implementation of the snake game",
 	"exports": "./dist/index.js",
 	"author": "ElCholoGamer",
