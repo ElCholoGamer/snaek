@@ -158,7 +158,6 @@ class Game {
 
 		console.clear();
 		console.log('Score: ' + this.score);
-		console.log('Borders:', this.options.solidBorders ? 'solid' : 'not solid');
 		console.log(grid.map(chars => chars.join(' ')).join('\n'));
 	}
 
