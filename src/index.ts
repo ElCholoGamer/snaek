@@ -1,8 +1,9 @@
 import chalk from 'chalk';
 import inquirer from 'inquirer';
-import { menuTitle } from './constants';
-import Game from './game';
-import { waitForKeyPress } from './utils';
+import { getGameOptions } from './config.js';
+import { menuTitle } from './constants.js';
+import Game from './game.js';
+import { waitForKeyPress } from './utils.js';
 
 async function helpMenu() {
 	const help = [
@@ -36,7 +37,7 @@ async function main() {
 			case 'Play':
 				Game.initInput();
 
-				const game = new Game({ gridSize: 10, activeApples: 2 });
+				const game = new Game(getGameOptions());
 				await game.run();
 				break;
 			case 'Help':

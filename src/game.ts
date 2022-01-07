@@ -1,6 +1,6 @@
-import { Direction } from './constants';
-import { Coordinate, GameOptions } from './types';
-import { sleep } from './utils';
+import { Direction } from './constants.js';
+import { Coordinate, GameOptions } from './types.js';
+import { sleep } from './utils.js';
 
 class Game {
 	private segments: Coordinate[] = [{ x: 4, y: 4 }];
@@ -43,7 +43,7 @@ class Game {
 			this.draw();
 
 			if (!this.alive) break;
-			await sleep(150);
+			await sleep(this.options.tickSpeed);
 		}
 
 		console.clear();

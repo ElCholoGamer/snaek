@@ -6,4 +6,5 @@ export interface Coordinate {
 export interface GameOptions {
 	gridSize: number;
 	activeApples: number;
+	tickSpeed: number;
 }
