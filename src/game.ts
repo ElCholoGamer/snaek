@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { Direction } from './constants.js';
 import { Coordinate, GameOptions } from './types.js';
 import { sleep } from './utils.js';
@@ -7,6 +8,7 @@ class Game {
 	private apples: Coordinate[] = [];
 	private direction = Direction.RIGHT;
 	private alive = false;
+	private countdown = 3;
 
 	private static keyDown = '';
 
@@ -39,6 +41,13 @@ class Game {
 
 		for (let i = 0; i < this.apples.length; i++) {
 			this.randomizeApple(i);
+		}
+
+		for (let i = 0; i < 3; i++) {
+			this.draw();
+
+			await sleep(1000);
+			this.countdown--;
 		}
 
 		this.alive = true;
@@ -162,7 +171,11 @@ class Game {
 		}
 
 		console.clear();
-		console.log('Score: ' + this.score);
+		if (this.countdown > 0) {
+			console.log(chalk.bold(`Get ready! ${this.countdown}`));
+		} else {
+			console.log('Score: ' + this.score);
+		}
 		console.log(grid.map(chars => chars.join(' ')).join('\n'));
 	}
 
