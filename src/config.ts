@@ -2,7 +2,7 @@ import ConfigStore from 'configstore';
 import { defaultOptions } from './constants.js';
 import { GameOptions } from './types.js';
 
-const config = new ConfigStore('snk', defaultOptions);
+const config = new ConfigStore('snaek', defaultOptions);
 
 export function getGameOptions(): GameOptions {
 	return config.all;
