@@ -18,3 +18,11 @@ export const defaultOptions: GameOptions = {
 	tickSpeed: 150,
 	solidBorders: true,
 };
+
+export const drawChars = {
+	empty: '.',
+	snakeBody: '\u25a0',
+	snakeDead: chalk.bold('X'),
+	hudLine: '─',
+	apple: chalk.bold('O'),
+};

@@ -1,11 +1,11 @@
 import chalk from 'chalk';
-import { menuTitle } from '../constants.js';
+import { drawChars, menuTitle } from '../constants.js';
 import { waitForKeyPress } from '../utils.js';
 
 async function helpMenu() {
 	const help = [
 		'Use the WASD keys to move.',
-		'Grab apples (\u25cf) and avoid crashing into your body (\u25a0).',
+		`Grab apples (${drawChars.apple}) and avoid crashing into your body (${drawChars.snakeBody}).`,
 	];
 
 	console.clear();

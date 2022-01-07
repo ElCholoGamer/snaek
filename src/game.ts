@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { Direction } from './constants.js';
+import { Direction, drawChars } from './constants.js';
 import { Coordinate, GameOptions } from './types.js';
 import { centerText, sleep } from './utils.js';
 
@@ -178,20 +178,24 @@ class Game {
 	}
 
 	private draw() {
-		const { gridSize } = this.options;
-		const grid: string[][] = [...Array(gridSize)].map(() => Array(gridSize).fill('.'));
+		const { empty, hudLine, snakeBody, snakeDead, apple } = drawChars;
 
-		for (const apple of this.apples) {
-			grid[apple.y][apple.x] = '\u25cf';
+		const { gridSize } = this.options;
+		const grid: string[][] = [...Array(gridSize)].map(() => Array(gridSize).fill(empty));
+
+		for (const applePos of this.apples) {
+			grid[applePos.y][applePos.x] = apple;
 		}
 
 		for (let i = 0; i < this.segments.length; i++) {
 			const segment = this.segments[i];
-			grid[segment.y][segment.x] = !this.alive && i === 0 ? chalk.bold('X') : '\u25a0';
+			grid[segment.y][segment.x] = !this.alive && i === 0 ? snakeDead : snakeBody;
 		}
 
+		const centeredHud = centerText(` ${this.hudText} `, this.options.gridSize * 2 - 1, hudLine);
+
 		console.clear();
-		console.log(chalk.bold(centerText(` ${this.hudText} `, this.options.gridSize * 2 - 1, '─')));
+		console.log(chalk.bold(centeredHud));
 		console.log(grid.map(chars => chars.join(' ')).join('\n'));
 	}
 
