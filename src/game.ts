@@ -15,14 +15,18 @@ class Game {
 		process.stdin.resume();
 		process.stdin.setEncoding('utf-8');
 
-		process.stdin.on('data', data => {
-			const key = data.toString();
-			if (key === '\u0003') process.exit();
+		if (!process.stdin.listeners('data').includes(Game.handleStdin)) {
+			process.stdin.on('data', Game.handleStdin);
+		}
+	}
 
-			if ('wasd'.includes(key)) {
-				Game.keyDown = key;
-			}
-		});
+	public static handleStdin(data: Buffer) {
+		const key = data.toString();
+		if (key === '\u0003') process.exit();
+
+		if ('wasd'.includes(key)) {
+			Game.keyDown = key;
+		}
 	}
 
 	public constructor(private readonly options: GameOptions) {}
