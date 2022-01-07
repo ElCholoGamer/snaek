@@ -40,9 +40,10 @@ class Game {
 
 		while (true) {
 			this.tick();
-			this.draw();
 
 			if (!this.alive) break;
+
+			this.draw();
 			await sleep(this.options.tickSpeed);
 		}
 
@@ -96,26 +97,40 @@ class Game {
 		}
 
 		// Head movement
-		const { gridSize } = this.options;
+		const { gridSize, solidBorders } = this.options;
 
 		switch (this.direction) {
 			case Direction.UP:
 				head.y--;
-				if (head.y < 0) head.y += gridSize;
 				break;
 			case Direction.DOWN:
-				head.y = ++head.y % gridSize;
+				head.y++;
 				break;
 			case Direction.LEFT:
 				head.x--;
-				if (head.x < 0) head.x += gridSize;
 				break;
 			case Direction.RIGHT:
-				head.x = ++head.x % gridSize;
-				break;
+				head.x++;
 		}
 
-		if (this.segments.slice(1).some(segment => head.x === segment.x && head.y === segment.y)) {
+		if (!solidBorders) {
+			if (head.y < 0) {
+				head.y += gridSize;
+			} else {
+				head.y %= gridSize;
+			}
+
+			if (head.x < 0) {
+				head.x += gridSize;
+			} else {
+				head.x %= gridSize;
+			}
+		}
+
+		if (
+			(solidBorders && (head.x < 0 || head.y < 0 || head.x >= gridSize || head.y >= gridSize)) ||
+			this.segments.slice(1).some(segment => head.x === segment.x && head.y === segment.y)
+		) {
 			// ded
 			this.alive = false;
 			return;
@@ -143,6 +158,7 @@ class Game {
 
 		console.clear();
 		console.log('Score: ' + this.score);
+		console.log('Borders:', this.options.solidBorders ? 'solid' : 'not solid');
 		console.log(grid.map(chars => chars.join(' ')).join('\n'));
 	}
 

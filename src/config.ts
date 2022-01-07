@@ -1,10 +1,7 @@
 import ConfigStore from 'configstore';
+import { defaultOptions } from './constants.js';
 
-const config = new ConfigStore('snaek', {
-	gridSize: 10,
-	activeApples: 2,
-	tickSpeed: 150,
-});
+const config = new ConfigStore('snk', defaultOptions);
 
 export function getGameOptions() {
 	return config.all;

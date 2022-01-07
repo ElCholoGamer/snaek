@@ -16,4 +16,5 @@ export const defaultOptions: GameOptions = {
 	gridSize: 10,
 	activeApples: 1,
 	tickSpeed: 150,
+	solidBorders: true,
 };
