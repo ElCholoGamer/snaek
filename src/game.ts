@@ -5,23 +5,46 @@ import { sleep } from './utils';
 class Game {
 	private segments: Coordinate[] = [{ x: 4, y: 4 }];
 	private apples: Coordinate[] = [...Array(this.options.activeApples)].map(() => ({ x: 0, y: 0 }));
-	private keyDown = '';
 	private direction = Direction.RIGHT;
+	private alive = false;
+
+	private static keyDown = '';
+
+	public static initInput() {
+		process.stdin.setRawMode(true);
+		process.stdin.resume();
+		process.stdin.setEncoding('utf-8');
+
+		process.stdin.on('data', data => {
+			const key = data.toString();
+			if (key === '\u0003') process.exit();
+
+			if ('wasd'.includes(key)) {
+				Game.keyDown = key;
+			}
+		});
+	}
 
 	public constructor(private readonly options: GameOptions) {}
 
 	public async run() {
-		process.stdin.on('data', this.onKeyDown);
-
 		for (let i = 0; i < this.apples.length; i++) {
 			this.randomizeApple(i);
 		}
 
+		this.alive = true;
+
 		while (true) {
 			this.tick();
 			this.draw();
+
+			if (!this.alive) break;
 			await sleep(150);
 		}
+
+		console.clear();
+		console.log('GAME OVER');
+		console.log('Final score: ' + this.score);
 	}
 
 	private randomizeApple(index: number) {
@@ -37,7 +60,7 @@ class Game {
 	}
 
 	private tick() {
-		switch (this.keyDown) {
+		switch (Game.keyDown) {
 			case 'w':
 				if (this.direction !== Direction.DOWN) {
 					this.direction = Direction.UP;
@@ -62,46 +85,43 @@ class Game {
 		const tailClone = { ...this.segments[this.segments.length - 1] };
 		const head = this.segments[0];
 
-		for (let i = this.segments.length - 1; i >= 0; i--) {
-			const segment = this.segments[i];
+		for (let i = this.segments.length - 1; i > 0; i--) {
+			const follow = this.segments[i - 1];
+			this.segments[i].x = follow.x;
+			this.segments[i].y = follow.y;
+		}
 
-			if (segment !== head) {
-				const follow = this.segments[i - 1];
-				segment.x = follow.x;
-				segment.y = follow.y;
-				continue;
-			}
+		// Head movement
+		const { gridSize } = this.options;
 
-			// Head movement
-			const { gridSize } = this.options;
-
-			switch (this.direction) {
-				case Direction.UP:
-					head.y--;
-					if (head.y < 0) head.y += gridSize;
-					break;
-				case Direction.DOWN:
-					head.y = ++head.y % gridSize;
-					break;
-				case Direction.LEFT:
-					head.x--;
-					if (head.x < 0) head.x += gridSize;
-					break;
-				case Direction.RIGHT:
-					head.x = ++head.x % gridSize;
-					break;
-			}
+		switch (this.direction) {
+			case Direction.UP:
+				head.y--;
+				if (head.y < 0) head.y += gridSize;
+				break;
+			case Direction.DOWN:
+				head.y = ++head.y % gridSize;
+				break;
+			case Direction.LEFT:
+				head.x--;
+				if (head.x < 0) head.x += gridSize;
+				break;
+			case Direction.RIGHT:
+				head.x = ++head.x % gridSize;
+				break;
 		}
 
 		if (this.segments.slice(1).some(segment => head.x === segment.x && head.y === segment.y)) {
-			this.stop();
-		} else {
-			for (let a = 0; a < this.apples.length; a++) {
-				if (this.apples[a].x !== head.x || this.apples[a].y !== head.y) continue;
+			// ded
+			this.alive = false;
+			return;
+		}
 
-				this.segments.push(tailClone);
-				this.randomizeApple(a);
-			}
+		for (let a = 0; a < this.apples.length; a++) {
+			if (this.apples[a].x !== head.x || this.apples[a].y !== head.y) continue;
+
+			this.segments.push(tailClone);
+			this.randomizeApple(a);
 		}
 	}
 
@@ -122,23 +142,9 @@ class Game {
 		console.log(grid.map(chars => chars.join(' ')).join('\n'));
 	}
 
-	private stop() {
-		process.stdin.off('data', this.onKeyDown);
-
-		console.clear();
-		console.log('GAME OVER');
-		console.log('Final score: ' + this.score);
-		process.exit();
-	}
-
 	public get score(): number {
 		return this.segments.length - 1;
 	}
-
-	private onKeyDown = (data: Buffer) => {
-		this.keyDown = data.toString();
-		if (this.keyDown === '\u0003') process.exit();
-	};
 }
 
 export default Game;
