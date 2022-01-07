@@ -11,3 +11,13 @@ export function waitForKeyPress() {
 		});
 	});
 }
+
+export function centerText(text: string, width: number, fill = ' ') {
+	const space = width - text.length;
+	if (space <= 0) return text;
+
+	const lowerHalf = Math.floor(space / 2);
+	const upperHalf = Math.ceil(space / 2);
+
+	return fill.repeat(lowerHalf) + text + fill.repeat(upperHalf);
+}

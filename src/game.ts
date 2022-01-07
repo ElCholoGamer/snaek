@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import { Direction } from './constants.js';
 import { Coordinate, GameOptions } from './types.js';
-import { sleep } from './utils.js';
+import { centerText, sleep } from './utils.js';
 
 class Game {
 	private segments: Coordinate[] = [];
@@ -9,6 +9,7 @@ class Game {
 	private direction = Direction.RIGHT;
 	private alive = false;
 	private countdown = 3;
+	private hudText = '';
 
 	private static keyDown = '';
 
@@ -43,14 +44,13 @@ class Game {
 			this.randomizeApple(i);
 		}
 
-		for (let i = 0; i < 3; i++) {
-			this.draw();
-
-			await sleep(1000);
-			this.countdown--;
-		}
-
 		this.alive = true;
+
+		while (this.countdown > 0) {
+			this.hudText = `Get ready! ${this.countdown--}`;
+			this.draw();
+			await sleep(1000);
+		}
 
 		while (true) {
 			this.tick();
@@ -61,9 +61,22 @@ class Game {
 			await sleep(this.options.tickSpeed);
 		}
 
-		console.clear();
-		console.log('GAME OVER');
-		console.log('Final score: ' + this.score);
+		let gameOverVisible = true;
+
+		for (let i = 0; i < 7; i++) {
+			this.hudText = gameOverVisible ? ' Game Over ' : '           ';
+			this.draw();
+
+			gameOverVisible = !gameOverVisible;
+			await sleep(500);
+		}
+
+		await sleep(500);
+
+		this.hudText = `Final score: ${this.score}`;
+		this.draw();
+
+		await sleep(3000);
 	}
 
 	private randomizeApple(index: number) {
@@ -102,48 +115,44 @@ class Game {
 		}
 
 		const tailClone = { ...this.segments[this.segments.length - 1] };
-		const head = this.segments[0];
 
-		for (let i = this.segments.length - 1; i > 0; i--) {
-			const follow = this.segments[i - 1];
-			this.segments[i].x = follow.x;
-			this.segments[i].y = follow.y;
-		}
+		const newHead = { ...this.segments[0] };
 
 		// Head movement
 		const { gridSize, solidBorders } = this.options;
 
 		switch (this.direction) {
 			case Direction.UP:
-				head.y--;
+				newHead.y--;
 				break;
 			case Direction.DOWN:
-				head.y++;
+				newHead.y++;
 				break;
 			case Direction.LEFT:
-				head.x--;
+				newHead.x--;
 				break;
 			case Direction.RIGHT:
-				head.x++;
+				newHead.x++;
 		}
 
 		if (!solidBorders) {
-			if (head.y < 0) {
-				head.y += gridSize;
+			if (newHead.y < 0) {
+				newHead.y += gridSize;
 			} else {
-				head.y %= gridSize;
+				newHead.y %= gridSize;
 			}
 
-			if (head.x < 0) {
-				head.x += gridSize;
+			if (newHead.x < 0) {
+				newHead.x += gridSize;
 			} else {
-				head.x %= gridSize;
+				newHead.x %= gridSize;
 			}
 		}
 
 		if (
-			(solidBorders && (head.x < 0 || head.y < 0 || head.x >= gridSize || head.y >= gridSize)) ||
-			this.segments.slice(1).some(segment => head.x === segment.x && head.y === segment.y)
+			(solidBorders &&
+				(newHead.x < 0 || newHead.y < 0 || newHead.x >= gridSize || newHead.y >= gridSize)) ||
+			this.segments.slice(1).some(segment => newHead.x === segment.x && newHead.y === segment.y)
 		) {
 			// ded
 			this.alive = false;
@@ -151,11 +160,21 @@ class Game {
 		}
 
 		for (let a = 0; a < this.apples.length; a++) {
-			if (this.apples[a].x !== head.x || this.apples[a].y !== head.y) continue;
+			if (this.apples[a].x !== newHead.x || this.apples[a].y !== newHead.y) continue;
 
 			this.segments.push(tailClone);
 			this.randomizeApple(a);
 		}
+
+		for (let i = this.segments.length - 1; i > 0; i--) {
+			const follow = this.segments[i - 1];
+			this.segments[i].x = follow.x;
+			this.segments[i].y = follow.y;
+		}
+
+		this.segments[0] = newHead;
+
+		this.hudText = `Score: ${this.score}`;
 	}
 
 	private draw() {
@@ -166,16 +185,13 @@ class Game {
 			grid[apple.y][apple.x] = '\u25cf';
 		}
 
-		for (const segment of this.segments) {
-			grid[segment.y][segment.x] = '\u25a0';
+		for (let i = 0; i < this.segments.length; i++) {
+			const segment = this.segments[i];
+			grid[segment.y][segment.x] = !this.alive && i === 0 ? chalk.bold('X') : '\u25a0';
 		}
 
 		console.clear();
-		if (this.countdown > 0) {
-			console.log(chalk.bold(`Get ready! ${this.countdown}`));
-		} else {
-			console.log('Score: ' + this.score);
-		}
+		console.log(chalk.bold(centerText(` ${this.hudText} `, this.options.gridSize * 2 - 1, '─')));
 		console.log(grid.map(chars => chars.join(' ')).join('\n'));
 	}
 
