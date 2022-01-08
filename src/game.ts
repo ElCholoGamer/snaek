@@ -52,7 +52,8 @@ class Game {
 	public async run() {
 		const { gridSize } = this.options;
 
-		this.segments.push({ x: Math.floor(gridSize / 2), y: Math.floor(gridSize / 2) });
+		const middle = Math.floor((gridSize - 1) / 2);
+		this.segments.push({ x: middle, y: middle });
 		this.apples.push(...[...Array(this.options.activeApples)].map(() => ({ x: 0, y: 0 })));
 
 		for (let i = 0; i < this.apples.length; i++) {
@@ -164,10 +165,12 @@ class Game {
 			}
 		}
 
+		const bodySegments = this.segments.slice(1, this.segments.length - 1);
+
 		if (
 			(solidBorders &&
 				(newHead.x < 0 || newHead.y < 0 || newHead.x >= gridSize || newHead.y >= gridSize)) ||
-			this.segments.slice(1).some(segment => newHead.x === segment.x && newHead.y === segment.y)
+			bodySegments.some(segment => newHead.x === segment.x && newHead.y === segment.y)
 		) {
 			// ded
 			this.alive = false;
