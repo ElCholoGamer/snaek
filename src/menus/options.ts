@@ -51,7 +51,7 @@ async function optionsMenu() {
 					name: 'appleCount',
 					default: `${options.activeApples}`,
 					message: 'Select an apple count',
-					choices: [...Array(5)].map((_, index) => `${1 + index}`),
+					choices: [...Array(15)].map((_, index) => `${1 + index}`),
 				});
 
 				setOption('activeApples', Number(appleCount));
