@@ -56,9 +56,7 @@ class Game {
 		this.segments.push({ x: middle, y: middle });
 		this.apples.push(...[...Array(this.options.activeApples)].map(() => ({ x: 0, y: 0 })));
 
-		for (let i = 0; i < this.apples.length; i++) {
-			this.randomizeApple(i);
-		}
+		this.apples.forEach(apple => this.randomizeApple(apple));
 
 		Game.nextDirection = this.direction;
 		this.alive = true;
@@ -96,15 +94,13 @@ class Game {
 		await sleep(3000);
 	}
 
-	private randomizeApple(index: number) {
-		const apple = this.apples[index];
-
+	private randomizeApple(apple: Coordinate) {
 		do {
 			apple.x = Math.floor(Math.random() * this.options.gridSize);
 			apple.y = Math.floor(Math.random() * this.options.gridSize);
 		} while (
 			this.segments.some(segment => apple.x === segment.x && apple.y === segment.y) ||
-			this.apples.some((other, i) => i !== index && apple.x === other.x && apple.y === other.y)
+			this.apples.some((other, i) => other !== apple && apple.x === other.x && apple.y === other.y)
 		);
 	}
 
@@ -177,11 +173,12 @@ class Game {
 			return;
 		}
 
-		for (let a = 0; a < this.apples.length; a++) {
-			if (this.apples[a].x !== newHead.x || this.apples[a].y !== newHead.y) continue;
-
-			this.segments.push(tailClone);
-			this.randomizeApple(a);
+		for (const apple of this.apples) {
+			if (apple.x === newHead.x && apple.y === newHead.y) {
+				this.segments.push(tailClone);
+				this.randomizeApple(apple);
+				break;
+			}
 		}
 
 		for (let i = this.segments.length - 1; i > 0; i--) {
